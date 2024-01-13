@@ -1,0 +1,19 @@
+[remap]
+
+importer="oggvorbisstr"
+type="AudioStreamOggVorbis"
+uid="uid://xoqwoksqqrph"
+path="res://.godot/imported/Astral 2.ogg-16ceaeba53f02380917b870efcdef33b.oggvorbisstr"
+
+[deps]
+
+source_file="res://audio/music/Astral 2.ogg"
+dest_files=["res://.godot/imported/Astral 2.ogg-16ceaeba53f02380917b870efcdef33b.oggvorbisstr"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4
