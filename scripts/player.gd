@@ -1,11 +1,18 @@
 extends CharacterBody3D
 
+@export_group("physics")
 @export var PLAYER_PUSH = 5 # kg
 @export var SPEED = 5.0
 @export var SPRINT_SPEED = 8.0
 @export var JUMP_VELOCITY = 4.5
+
+@export_group("input")
 @export var CAMERA_MAX_X = 85
 @export var CAMERA_MIN_X = -85
+
+@export_group("interact")
+@export var INTERACT_DISTANCE = 3
+@export var SELECTED_NODE : Node3D = null
 
 var sprinting = false
 var current_speed = SPEED
@@ -16,6 +23,33 @@ var sensitivty = 0.01
 
 @onready var neck := $Neck
 @onready var camera := $Neck/Camera3D
+@onready var spring := $Neck/Camera3D/SpringArm3D
+
+func player_has_item():
+	return spring.get_child_count() > 0
+	
+func _process(delta):
+	check_interact()
+	
+func check_interact():
+	var space_state = get_world_3d().direct_space_state
+	var camera_global = camera.get_global_transform()
+	var origin = camera.global_position
+	var end = origin + -camera_global.basis.z * INTERACT_DISTANCE
+	var query = PhysicsRayQueryParameters3D.create(origin, end, 0xFFFFFFFF, [self])
+	query.collide_with_areas = true
+	
+	var result = space_state.intersect_ray(query)
+	SELECTED_NODE = result.get("collider")
+	
+	print(SELECTED_NODE)
+	
+
+func interact(node):
+	pass
+
+func pickup(node):
+	node.is_in_group("pickupable")
 
 func _unhandled_input(event):
 	if event is InputEventMouseButton:
@@ -44,12 +78,12 @@ func _physics_process(delta):
 	# As good practice, you should replace UI actions with custom gameplay actions.
 	var input_dir = Input.get_vector("left", "right", "forward", "back");
 	var direction = (neck.transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
-	
+
 	if sprinting:
 		current_speed = SPRINT_SPEED
 	else:
 		current_speed = SPEED
-	
+
 	if direction:
 		velocity.x = direction.x * current_speed
 		velocity.z = direction.z * current_speed
