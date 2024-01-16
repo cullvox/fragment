@@ -12,7 +12,7 @@ extends CharacterBody3D
 
 @export_group("interact")
 @export var INTERACT_DISTANCE = 3
-@export var SELECTED_NODE : Node3D = null
+@export var SELECTED_NODE : Interact = null
 
 var sprinting = false
 var current_speed = SPEED
@@ -29,9 +29,11 @@ func player_has_item():
 	return spring.get_child_count() > 0
 	
 func _process(delta):
-	check_interact()
+	process_interact()
 	
-func check_interact():
+func process_interact():
+	
+	# Send out a raycast for any interactable objects.
 	var space_state = get_world_3d().direct_space_state
 	var camera_global = camera.get_global_transform()
 	var origin = camera.global_position
@@ -40,13 +42,20 @@ func check_interact():
 	query.collide_with_areas = true
 	
 	var result = space_state.intersect_ray(query)
-	SELECTED_NODE = result.get("collider")
+	var hovered = result.get("collider")
 	
-	print(SELECTED_NODE)
+	# If nothing is there then nothing is interactable.
+	if !hovered:
+		SELECTED_NODE = null
+		return
 	
-
-func interact(node):
-	pass
+	# Make sure that the casted object is in any interact groups.
+	if hovered.is_in_group("interact"):
+		SELECTED_NODE = hovered as Interact
+	
+	# This object is not interactable.
+	else:
+		SELECTED_NODE = null
 
 func pickup(node):
 	node.is_in_group("pickupable")
@@ -64,6 +73,13 @@ func _unhandled_input(event):
 			camera.rotation.x = clampf(camera.rotation.x, deg_to_rad(CAMERA_MIN_X), deg_to_rad(CAMERA_MAX_X))
 
 	sprinting = Input.is_action_pressed("sprint")
+	
+	if Input.is_action_pressed("interact"):
+		
+		print("Interacting with: ", SELECTED_NODE)
+		
+		if SELECTED_NODE:
+			SELECTED_NODE.interact.emit()
 
 func _physics_process(delta):
 	# Add the gravity.
@@ -92,7 +108,7 @@ func _physics_process(delta):
 		velocity.z = move_toward(velocity.z, 0, current_speed)
 
 	move_and_slide()
-	
+
 	# Compute inertia on other objects the player interacts with
 	for i in get_slide_collision_count():
 		var c = get_slide_collision(i)

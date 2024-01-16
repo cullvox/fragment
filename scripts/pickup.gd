@@ -1,6 +1,5 @@
-extends Node
-
-@export var can_pickup = true
+extends Node3D
+class_name Interactable
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -10,8 +9,6 @@ func _ready():
 func _process(delta):
 	pass
 
-func on_pickup():
-	pass
-	
-func on_drop():
-	pass
+# Determine if the player is allowed to pickup this object.
+func can_pickup():
+	return true
