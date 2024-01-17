@@ -23,11 +23,10 @@ var sensitivty = 0.01
 
 @onready var neck := $Neck
 @onready var camera := $Neck/Camera3D
-@onready var spring := $Neck/Camera3D/SpringArm3D
 
 func player_has_item():
-	return spring.get_child_count() > 0
-	
+	pass
+
 func _process(delta):
 	process_interact()
 	

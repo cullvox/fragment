@@ -1,5 +1,5 @@
-extends Node3D
-class_name Interactable
+extends Interact
+class_name Pickup
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
